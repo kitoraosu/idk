@@ -1,0 +1,49 @@
+name: Build and release Windows x64
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure with CMake
+        run: cmake -S . -B build -A x64 -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --target tetris -- -m:1
+
+      - name: Package executable
+        shell: powershell
+        run: |
+          $exe = "build\Release\tetris.exe"
+          if (-not (Test-Path $exe)) { $exe = "build\tetris.exe" }
+          if (-not (Test-Path $exe)) { Write-Error "Executable not found"; exit 1 }
+          Compress-Archive -Path $exe -DestinationPath tetris-windows-x64.zip -Force
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: windows-build-${{ github.sha }}
+          release_name: Windows x64 build ${{ github.sha }}
+          body: Automated Windows x64 build from commit ${{ github.sha }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: tetris-windows-x64.zip
+          asset_name: tetris-windows-x64.zip
+          asset_content_type: application/zip
