@@ -16,7 +16,7 @@ jobs:
         run: cmake -S . -B build -A x64 -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
-        run: cmake --build build --config Release --target tetris -- -m:1
+        run: cmake --build build --config Release --target tetris
 
       - name: Package executable
         shell: powershell
