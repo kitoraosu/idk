@@ -43,6 +43,10 @@ static const std::array<std::array<Shape,4>,7> TETROMINOS = []{
 
 static const std::array<COLORREF,7> COLORS = { RGB(0,240,240), RGB(0,0,240), RGB(240,160,0), RGB(240,240,0), RGB(0,240,0), RGB(160,0,240), RGB(240,0,0) };
 
+// Forward declaration of WndProc
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+static HWND g_hwnd = NULL;
+
 struct Piece {
     int type = 0;
     int rot = 0;
@@ -114,7 +118,7 @@ struct Game {
             int new_speed = 500 - (level - 1) * 30;
             speed_ms = (std::min)(80, new_speed);
             // Timer may be created on HWND or thread queue; safe to call even if HWND set later
-            SetTimer(g_hwnd, 1, speed_ms, NULL);
+            if (g_hwnd) SetTimer(g_hwnd, 1, speed_ms, NULL);
         }
     }
     void rotate(){ if (!collides(cur,0,0,1)) cur.rot = (cur.rot+1)&3; }
@@ -122,10 +126,6 @@ struct Game {
     bool softDrop(){ if (!collides(cur,0,1)){ cur.y+=1; return true; } else { lock(); return false; } }
     void hardDrop(){ while(!collides(cur,0,1)) cur.y++; lock(); }
 } game;
-
-// Forward declaration of WndProc
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-static HWND g_hwnd = NULL;
 
 void drawBlock(HDC hdc, int cx, int cy, COLORREF col){
     RECT r{cx, cy, cx+BLOCK-1, cy+BLOCK-1};
