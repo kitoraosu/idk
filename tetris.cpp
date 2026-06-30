@@ -2,6 +2,9 @@
 // Single-file Tetris clone using Win32/GDI. Builds with CMake on Windows (x64).
 // Controls: Left/Right - move, Up - rotate, Down - soft drop, Space - hard drop, P - pause
 
+#define UNICODE
+#define _UNICODE
+
 #include <windows.h>
 #include <vector>
 #include <array>
@@ -176,7 +179,7 @@ void draw(HDC hdc){
     // draw next piece
     int nx = sx + fieldW + 24;
     int ny = sy;
-    TextOut(hdc, nx, ny, L"Next:", 5);
+    TextOutW(hdc, nx, ny, L"Next:", 5);
     ny += 24;
     for (auto &c: game.next.cells()){
         int x = nx + c.x*BLOCK/2;
@@ -189,15 +192,15 @@ void draw(HDC hdc){
     // score
     std::wstring s = L"Score: " + std::to_wstring(game.score);
     std::wstring l = L"Level: " + std::to_wstring(game.level);
-    TextOut(hdc, nx, ny + 120, s.c_str(), (int)s.size());
-    TextOut(hdc, nx, ny + 150, l.c_str(), (int)l.size());
+    TextOutW(hdc, nx, ny + 120, s.c_str(), (int)s.size());
+    TextOutW(hdc, nx, ny + 150, l.c_str(), (int)l.size());
     if (game.paused){
         std::wstring p = L"PAUSED";
-        TextOut(hdc, sx + fieldW/2 - 30, sy + fieldH/2, p.c_str(), (int)p.size());
+        TextOutW(hdc, sx + fieldW/2 - 30, sy + fieldH/2, p.c_str(), (int)p.size());
     }
     if (game.gameover){
         std::wstring g = L"GAME OVER";
-        TextOut(hdc, sx + fieldW/2 - 40, sy + fieldH/2, g.c_str(), (int)g.size());
+        TextOutW(hdc, sx + fieldW/2 - 40, sy + fieldH/2, g.c_str(), (int)g.size());
     }
 }
 
