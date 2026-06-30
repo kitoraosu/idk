@@ -11,6 +11,7 @@
 #include <random>
 #include <chrono>
 #include <string>
+#include <algorithm>
 
 constexpr int COLS = 10;
 constexpr int ROWS = 20;
@@ -110,7 +111,8 @@ struct Game {
         if (cleared){
             score += (cleared * 100) * level;
             level = 1 + score / 1000;
-            speed_ms = std::max(80, 500 - (level-1)*30);
+            int new_speed = 500 - (level - 1) * 30;
+            speed_ms = (std::min)(80, new_speed);
             // Timer may be created on HWND or thread queue; safe to call even if HWND set later
             SetTimer(g_hwnd, 1, speed_ms, NULL);
         }
